@@ -39,12 +39,14 @@ int main()
 		pc = c;
 	}
 	/* print the histogram */
+	char chars[] = "....,....;";
+	unsigned chars_count = strlen(chars);
 	for (int i = 0; i < MAX_LENGTH; ++i) {
 		if (word_lengths[i]) {
 			/* only print the values > 0 */
 			printf(" %3d:", i+1);
 			for (int j = 0; j < word_lengths[i]; ++j) {
-				putchar('#');
+				putchar(chars[j % chars_count]);
 			}
 			printf(" [%u]\n", word_lengths[i]);
 		}
@@ -53,7 +55,7 @@ int main()
 		/* only print if > 0 */
 		printf(">%3d:", MAX_LENGTH);
 		for (int j = 0; j < word_excess_length; ++j) {
-			putchar('#');
+			putchar(chars[j % chars_count]);
 		}
 		printf(" [%u]\n", word_excess_length);
 	}
