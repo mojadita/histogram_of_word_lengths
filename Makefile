@@ -5,7 +5,6 @@
 # License: BSD
 
 targets = hwl
-toclean += $(targets)
 
 RM      ?= rm -f
 
@@ -13,11 +12,13 @@ hwl_deps =
 hwl_objs = hwl.o
 hwl_libs =
 hwl_ldfl =
-toclean += $(hwl_objs)
 
 all: $(targets)
+clean:
+	$(RM) $(toclean)
 
 .for t in $(targets)
+toclean += $t $($t_objs)
 $t: $($t_deps) $($t_objs)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $($@_ldfl) $($@_objs) $($@_libs) $(LIBS)
 .endfor

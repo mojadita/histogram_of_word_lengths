@@ -15,6 +15,7 @@
 
 #define RESIZE_INCREMENT    (8)
 #define DEFAULT_COLUMNS     (70)
+
 #define F(F_fmt) "%s:%d:%s:"F_fmt, __FILE__, __LINE__, __func__
 #define WRN_TAIL(WT_fmt, ...) fprintf(stderr, WT_fmt, ##__VA_ARGS__)
 #define WRN(W_fmt, ...) WRN_TAIL(F("WARNING: "W_fmt), ##__VA_ARGS__)
@@ -22,7 +23,7 @@
 size_t num_columns = DEFAULT_COLUMNS;
 
 /* forward reference */
-void process(char *file_name, FILE *in, FILE *out);
+void process(const char *file_name, FILE *in, FILE *out);
 
 int main(int argc, char **argv)
 {
@@ -63,15 +64,19 @@ int main(int argc, char **argv)
     }
 } /* main */
 
-#define GROW_ARRAY(_type, _name, _increm) do {            \
-            if (_name##_len == _name##_cap) {             \
-                _name##_cap += (_increm);                 \
-                _name = realloc(_name,                    \
-                        (sizeof *_name) * (_name##_cap)); \
-            }                                             \
+#define GROW_ARRAY(_type, _name, _increm) do { \
+            if (_name##_len == _name##_cap) {  \
+                _name##_cap += (_increm);      \
+                _name        = realloc(_name,  \
+                        (sizeof *_name)        \
+						* (_name##_cap));      \
+            }                                  \
         } while (0)
 
-void process(char *file_name, FILE *in, FILE *out)
+void process(
+		const char *file_name,
+		FILE *in,
+		FILE *out)
 {
     int c, pc = ' ';
     size_t word_length,
@@ -103,13 +108,14 @@ void process(char *file_name, FILE *in, FILE *out)
         pc = c;
     }
     /* print the histogram */
-    fprintf(out, "[%s]: most_frequent_len = %zd chars, most_frequent = %zd times\n",
-            file_name, most_frequent_len, most_frequent);
+    fprintf(out, "[%s]\n", file_name);
     for (int i = 0; i < word_lengths_len; ++i) {
-        if (word_lengths[i]) {
+        if (word_lengths[i] > 0) {
             /* only print the values > 0 */
             fprintf(out, "%4d:", i+1);
-			size_t n = (word_lengths[i] * num_columns + (most_frequent >> 1)) / most_frequent;
+			size_t n = (word_lengths[i] * num_columns
+					 + (most_frequent >> 1))
+					 / most_frequent;
             for (int j = 0; j < n; ++j) {
                 fputc('#', out);
             }
@@ -118,4 +124,4 @@ void process(char *file_name, FILE *in, FILE *out)
     }
     if (word_lengths)
         free(word_lengths);
-} /* main */
+} /* process */
