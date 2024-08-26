@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
 
 #define RESIZE_INCREMENT    (8)
 #define DEFAULT_COLUMNS     (70)
@@ -29,6 +31,14 @@ int main(int argc, char **argv)
 {
     char *out_name = NULL;
     int opt;
+
+	if (isatty(1)) {
+		struct winsize ws;
+		int res = ioctl(1, TIOCGWINSZ, &ws);
+		if (res >= 0) {
+			num_columns = ws.ws_col - 15;
+		}
+	}
     while ((opt = getopt(argc, argv, "c:o:")) != EOF) {
         switch (opt) {
         case 'c': num_columns = atoi(optarg); break;
