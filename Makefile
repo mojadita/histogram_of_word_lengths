@@ -5,6 +5,7 @@
 # License: BSD
 
 targets = hwl
+toclean += $(targets)
 
 RM      ?= rm -f
 
@@ -12,13 +13,31 @@ hwl_deps =
 hwl_objs = hwl.o
 hwl_libs =
 hwl_ldfl =
+toclean += $(hwl_objs)
 
 all: $(targets)
 clean:
 	$(RM) $(toclean)
 
-.for t in $(targets)
-toclean += $t $($t_objs)
-$t: $($t_deps) $($t_objs)
+prefix      ?= /usr/local
+exec_prefix ?= $(prefix)
+bindir      ?= $(exec_prefix)/bin
+
+OWNR        ?= root
+GROP        ?= bin
+XMOD        ?= 0511
+
+INSTALL     ?= install
+IFLAGS      ?= -o $(OWNR) -g $(GROP)
+
+install: $(targets)
+	$(INSTALL) $(IFLAGS) -d $(bindir)
+	for p in $(targets); \
+	do $(INSTALL) $(IFLAGS) -m $(XMOD) $$p $(bindir)/$$p; \
+	done
+
+uninstall:
+	$(RM) $(patsubst %, $(bindir)/%, $(targets))
+
+hwl: $(hwl_deps) $(hwl_objs)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $($@_ldfl) $($@_objs) $($@_libs) $(LIBS)
-.endfor
