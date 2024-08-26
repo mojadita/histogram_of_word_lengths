@@ -32,21 +32,24 @@ int main(int argc, char **argv)
     char *out_name = NULL;
     int opt;
 
-	if (isatty(1)) {
-		struct winsize ws;
-		int res = ioctl(1, TIOCGWINSZ, &ws);
-		if (res >= 0) {
-			num_columns = ws.ws_col - 15;
-		}
-	}
+    if (isatty(1)) {
+        struct winsize ws;
+        int res = ioctl(1, TIOCGWINSZ, &ws);
+        if (res >= 0) {
+            num_columns = ws.ws_col;
+        }
+    }
+
     while ((opt = getopt(argc, argv, "c:o:")) != EOF) {
         switch (opt) {
         case 'c': num_columns = atoi(optarg); break;
         case 'o': out_name = optarg; break;
         }
     }
+
     argc -= optind;
     argv += optind;
+
     FILE *out = NULL;
     if (out_name) {
         out = fopen(out_name, "r");
@@ -79,22 +82,25 @@ int main(int argc, char **argv)
                 _name##_cap += (_increm);      \
                 _name        = realloc(_name,  \
                         (sizeof *_name)        \
-						* (_name##_cap));      \
+                        * (_name##_cap));      \
             }                                  \
         } while (0)
 
 void process(
-		const char *file_name,
-		FILE *in,
-		FILE *out)
+        const char *file_name,
+        FILE *in,
+        FILE *out)
 {
     int c, pc = ' ';
+
     size_t word_length,
         most_frequent = 0,
         most_frequent_len;
+
     size_t *word_lengths = NULL,
            word_lengths_len = 0,
            word_lengths_cap = 0;
+
     while ((c = fgetc(in)) != EOF) {
         if (isalpha(c)) {
             /* in word */
@@ -117,21 +123,27 @@ void process(
         }
         pc = c;
     }
+
     /* print the histogram */
+    int size_of_word_lengths = snprintf(NULL, 0, "%zu", word_lengths_len),
+        to_discount          = snprintf(NULL, 0, ":<%zu>", most_frequent);
+
     fprintf(out, "[%s]\n", file_name);
     for (int i = 0; i < word_lengths_len; ++i) {
         if (word_lengths[i] > 0) {
             /* only print the values > 0 */
-            fprintf(out, "%4d:", i+1);
-			size_t n = (word_lengths[i] * num_columns
-					 + (most_frequent >> 1))
-					 / most_frequent;
+            fprintf(out, "%*u:", size_of_word_lengths, i + 1);
+            int n = (num_columns * word_lengths[i] + (most_frequent >> 1))
+                     / most_frequent
+                     - size_of_word_lengths
+                     - to_discount;
             for (int j = 0; j < n; ++j) {
                 fputc('#', out);
             }
             fprintf(out, "<%zu>\n", word_lengths[i]);
         }
     }
-    if (word_lengths)
+    if (word_lengths) {
         free(word_lengths);
+    }
 } /* process */
