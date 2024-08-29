@@ -23,6 +23,7 @@
 #define WRN(W_fmt, ...) WRN_TAIL(F("WARNING: "W_fmt), ##__VA_ARGS__)
 
 size_t num_columns = DEFAULT_COLUMNS;
+int    debug       = 0;
 
 /* forward reference */
 void process(const char *file_name, FILE *in, FILE *out);
@@ -43,6 +44,7 @@ int main(int argc, char **argv)
     while ((opt = getopt(argc, argv, "c:o:")) != EOF) {
         switch (opt) {
         case 'c': num_columns = atoi(optarg); break;
+		case 'd': debug = 1; break;
         case 'o': out_name = optarg; break;
         }
     }
@@ -100,21 +102,27 @@ void process(
     size_t *word_lengths = NULL,
            word_lengths_len = 0,
            word_lengths_cap = 0;
-
+	char buffer[1000], *p;
     while ((c = fgetc(in)) != EOF) {
         if (isalpha(c)) {
             /* in word */
             if (!isalpha(pc)) {
                 /* start of word */
                 word_length = 0;
+				if (debug) p = buffer;
             }
             word_length++;
+			if (debug) *p++ = c;
         } else if (isalpha(pc)) {
             while (word_length >= word_lengths_len) {
                 GROW_ARRAY(size_t, word_lengths, RESIZE_INCREMENT);
                 word_lengths[word_lengths_len++] = 0;
             }
             /* end of word */
+			if (debug) {
+				*p = 0;
+				printf("%zd %s\n", word_length, buffer);
+			}
             word_lengths[word_length - 1]++;
             if (most_frequent < word_lengths[word_length - 1]) {
                 most_frequent = word_lengths[word_length - 1];
