@@ -16,6 +16,8 @@ hwl_libs =
 hwl_ldfl =
 toclean += $(hwl_objs)
 
+.SUFFIXES: .1 .pdf
+
 all: $(targets)
 clean:
 	$(RM) $(toclean)
@@ -47,5 +49,5 @@ uninstall:
 hwl: $(hwl_deps) $(hwl_objs)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $($@_ldfl) $($@_objs) $($@_libs) $(LIBS)
 
-hwl.1.pdf: hwl.1
+.1.pdf:
 	groff -Tpdf -mandoc $< > $@
