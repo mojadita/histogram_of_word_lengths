@@ -98,9 +98,9 @@ void process(
         most_frequent = 0,
         most_frequent_len;
 
-    size_t *word_lengths = NULL,
-           word_lengths_len = 0,
-           word_lengths_cap = 0;
+    size_t *word_freqs = NULL,
+           word_freqs_len = 0,
+           word_freqs_cap = 0;
 	char buffer[1000], *p;
     while ((c = fgetc(in)) != EOF) {
         if (isalpha(c)) {
@@ -113,18 +113,18 @@ void process(
             word_length++;
 			if (debug) *p++ = c;
         } else if (isalpha(pc)) {
-            while (word_length >= word_lengths_len) {
-                GROW_ARRAY(size_t, word_lengths, RESIZE_INCREMENT);
-                word_lengths[word_lengths_len++] = 0;
+            while (word_length >= word_freqs_len) {
+                GROW_ARRAY(size_t, word_freqs, RESIZE_INCREMENT);
+                word_freqs[word_freqs_len++] = 0;
             }
             /* end of word */
 			if (debug) {
 				*p = 0;
 				printf("%zd %s\n", word_length, buffer);
 			}
-            word_lengths[word_length - 1]++;
-            if (most_frequent < word_lengths[word_length - 1]) {
-                most_frequent = word_lengths[word_length - 1];
+            word_freqs[word_length - 1]++;
+            if (most_frequent < word_freqs[word_length - 1]) {
+                most_frequent = word_freqs[word_length - 1];
                 most_frequent_len = word_length;
             }
         }
@@ -132,25 +132,25 @@ void process(
     }
 
     /* print the histogram */
-    int size_of_word_lengths = snprintf(NULL, 0, "%zu", word_lengths_len),
+    int size_of_word_lengths = snprintf(NULL, 0, "%zu", word_freqs_len),
         to_discount          = snprintf(NULL, 0, ":<%zu>", most_frequent);
+    int max = num_columns - size_of_word_lengths - to_discount;
 
     fprintf(out, "[%s]\n", file_name);
-    for (int i = 0; i < word_lengths_len; ++i) {
-        if (word_lengths[i] > 0) {
+    for (int i = 0; i < word_freqs_len; ++i) {
+        if (word_freqs[i] > 0) {
             /* only print the values > 0 */
             fprintf(out, "%*u:", size_of_word_lengths, i + 1);
-            int n = (num_columns * word_lengths[i] + (most_frequent >> 1))
-                     / most_frequent
-                     - size_of_word_lengths
-                     - to_discount;
+
+            int n = (max * word_freqs[i] + (most_frequent_len >> 1))
+                  / most_frequent_len;
             for (int j = 0; j < n; ++j) {
                 fputc('#', out);
             }
-            fprintf(out, "<%zu>\n", word_lengths[i]);
+            fprintf(out, "<%zu>\n", word_freqs[i]);
         }
     }
-    if (word_lengths) {
-        free(word_lengths);
+    if (word_freqs) {
+        free(word_freqs);
     }
 } /* process */
