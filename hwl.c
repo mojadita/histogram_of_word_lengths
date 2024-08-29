@@ -25,6 +25,9 @@
 size_t num_columns = DEFAULT_COLUMNS;
 int    debug       = 0;
 
+const char *seq    = "..................................................";
+size_t seq_l;
+
 /* forward reference */
 void process(const char *file_name, FILE *in, FILE *out);
 
@@ -41,20 +44,22 @@ int main(int argc, char **argv)
         }
     }
 
-    while ((opt = getopt(argc, argv, "c:o:")) != EOF) {
+    while ((opt = getopt(argc, argv, "c:do:s:")) != EOF) {
         switch (opt) {
         case 'c': num_columns = atoi(optarg); break;
 		case 'd': debug = 1; break;
         case 'o': out_name = optarg; break;
+        case 's': seq = optarg; break;
         }
     }
 
+    seq_l = strlen(seq); 
     argc -= optind;
     argv += optind;
 
     FILE *out = NULL;
     if (out_name) {
-        out = fopen(out_name, "r");
+        out = fopen(out_name, "a");
         if (!out)
             WRN("%s: %s, switching to stdout\n",
                 out_name, strerror(errno));
@@ -133,21 +138,20 @@ void process(
 
     /* print the histogram */
     int size_of_word_lengths = snprintf(NULL, 0, "%zu", word_freqs_len),
-        to_discount          = snprintf(NULL, 0, ":<%zu>", most_frequent);
+        to_discount          = snprintf(NULL, 0, ":  <%zu>", most_frequent);
     int max = num_columns - size_of_word_lengths - to_discount;
 
     fprintf(out, "[%s]\n", file_name);
     for (int i = 0; i < word_freqs_len; ++i) {
         if (word_freqs[i] > 0) {
             /* only print the values > 0 */
-            fprintf(out, "%*u:", size_of_word_lengths, i + 1);
+            fprintf(out, "%*u: ", size_of_word_lengths, i + 1);
 
-            int n = (max * word_freqs[i] + (most_frequent_len >> 1))
-                  / most_frequent_len;
-            for (int j = 0; j < n; ++j) {
-                fputc('#', out);
+            int n = (max * word_freqs[i] + (most_frequent >> 1)) / most_frequent;
+            while (n >= seq_l) {
+                n -= fprintf(out, "%s", seq);
             }
-            fprintf(out, "<%zu>\n", word_freqs[i]);
+            fprintf(out, "%.*s <%zu>\n", n, seq, word_freqs[i]);
         }
     }
     if (word_freqs) {

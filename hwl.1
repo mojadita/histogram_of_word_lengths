@@ -9,13 +9,14 @@
 .Op Fl d
 .Op Fl o Ar output_file
 .Op Fl c Ar num_columns_output
+.Op Fl s Ar repeating_string
 .Sh DESCRIPTION
 The
 .Nm
 command reads a text file, identifies words (as sequences of
 alphabetic characters) and prints an histogram of word lengths
 to
-.Ar "standard output 
+.Ar stdout
 or the
 .fl o
 option specified file.
@@ -23,9 +24,14 @@ option specified file.
 .Bl -tag
 .It FL d
 This flag activates a debug mode that prints all words as they
-are recognized.
-This allows to sort them numerically and check that the number
-of words matches the corresponding row in the histogram.
+are recognized.  The debug info is output to
+.Ar stdout
+despite on specifying the
+.Fl o
+option.
+.Pp
+This allows to sort the output numerically and check that the
+number of words matches the corresponding row in the histogram.
 .It Fl c Ar num_columns_output
 The
 .Nm
@@ -39,6 +45,9 @@ system.
 .It Fl o Ar output_file
 This option allows to specify the output file to dump the
 histogram to.
+.It Fl s Ar repeating_string
+The string passed as argument is repeated to make the columns
+that conform the bars of the histogram.
 .El
 .Sh EXAMPLES
 The following is produced when
@@ -47,17 +56,22 @@ is run against its source file
 .Bd -literal
 $ hwl -c 40 hwl.c
 [hwl.c]
- 1:##############<68>
- 2:#########<52>
- 3:#################<77>
- 4:################################<121>
- 5:###<33>
- 6:#######<45>
- 7:##########<55>
- 8:<23>
- 9:<7>
-10:<2>
+ 1: ........................... <74>
+ 2: ................... <53>
+ 3: ............................... <86>
+ 4: ............................................. <124>
+ 5: ................... <52>
+ 6: ................. <47>
+ 7: .............. <39>
+ 8: ........ <23>
+ 9: ... <7>
+10: . <2>
 $ _
 .Ed
 .Sh AUTHORS
 .An "Luis Colorado" Aq luiscoloradourcola@gmail.com .
+.Pp
+This program was inspired on ``The C programming language''
+of Brian Kernighan and Dennis Ritchie.
+It appears there as an exercise (Ex 1-13 on page 24 of second
+edition)
