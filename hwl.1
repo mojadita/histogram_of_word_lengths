@@ -1,15 +1,15 @@
 .Dd aug/2024
 .Dt HWL 1
 .Os 
-.Sh Name
+.Sh NAME
 .Nm hwl
 .Nd histogram of word lengths.
-.Sh Synopsis
+.Sh SYNOPSIS
 .Nm hwl
 .Op Fl d
 .Op Fl o Ar output_file
 .Op Fl c Ar num_columns_output
-.Sh Description
+.Sh DESCRIPTION
 The
 .Nm
 command reads a text file, identifies words (as sequences of
@@ -19,9 +19,9 @@ to
 or the
 .fl o
 option specified file.
-.Sh Options
-.Bl -tag
-.It Fl d
+.Sh OPTIONS
+.bL -TAG
+.iT fL d
 This flag activates a debug mode that prints all words as they
 are recognized.
 This allows to sort them numerically and check that the number
@@ -40,7 +40,7 @@ system.
 This option allows to specify the output file to dump the
 histogram to.
 .El
-.Sh Examples
+.Sh EXAMPLES
 The following is produced when
 .Nm
 is run against its source file
@@ -59,7 +59,5 @@ $ hwl -c 40 hwl.c
 10:<2>
 $ _
 .Ed
-.Sh Authors
-.An "Luis Colorado" Aq luiscoloradourcola@gmail.com
-.Sh Bugs
-Unknown at this moment.
+.Sh AUTHORS
+.An "Luis Colorado" Aq luiscoloradourcola@gmail.com .
