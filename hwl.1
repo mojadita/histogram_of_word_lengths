@@ -1,0 +1,65 @@
+.Dd aug/2024
+.Dt HWL 1
+.Os 
+.Sh Name
+.Nm hwl
+.Nd histogram of word lengths.
+.Sh Synopsis
+.Nm hwl
+.Op Fl d
+.Op Fl o Ar output_file
+.Op Fl c Ar num_columns_output
+.Sh Description
+The
+.Nm
+command reads a text file, identifies words (as sequences of
+alphabetic characters) and prints an histogram of word lengths
+to
+.Ar "standard output 
+or the
+.fl o
+option specified file.
+.Sh Options
+.Bl -tag
+.It Fl d
+This flag activates a debug mode that prints all words as they
+are recognized.
+This allows to sort them numerically and check that the number
+of words matches the corresponding row in the histogram.
+.It Fl c Ar num_columns_output
+The
+.Nm
+command determines the number of columns to set the maximum
+histogram from the output device (or a default of
+.Ar DEFAULT_COLUMNS )
+in case the output is redirected to a device (or a pipe).
+You can specify a number of columns if you need to narrow
+the output or the output width is not detectable from the
+system.
+.It Fl o Ar output_file
+This option allows to specify the output file to dump the
+histogram to.
+.El
+.Sh Examples
+The following is produced when
+.Nm
+is run against its source file
+.Bd -literal
+$ hwl -c 40 hwl.c
+[hwl.c]
+ 1:#############<61>
+ 2:########<48>
+ 3:##################<77>
+ 4:################################<118>
+ 5:#<27>
+ 6:######<40>
+ 7:###########<55>
+ 8:<23>
+ 9:<7>
+10:<2>
+$ _
+.Ed
+.Sh Authors
+.An "Luis Colorado" Aq luiscoloradourcola@gmail.com
+.Sh Bugs
+Unknown at this moment.
