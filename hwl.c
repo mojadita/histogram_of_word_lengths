@@ -65,7 +65,6 @@ int main(int argc, char **argv)
     if (!argc) {
         process("stdin", stdin, out);
     } else {
-        int i;
         for (int i = 0; i < argc; i++) {
             FILE *in = fopen(argv[i], "r");
             if (!in) {

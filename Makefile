@@ -32,9 +32,7 @@ IFLAGS      ?= -o $(OWNR) -g $(GROP)
 
 install: $(targets)
 	$(INSTALL) $(IFLAGS) -d $(bindir)
-	for p in $(targets); \
-	do $(INSTALL) $(IFLAGS) -m $(XMOD) $$p $(bindir)/$$p; \
-	done
+	$(INSTALL) $(IFLAGS) -m $(XMOD) $(targets) $(bindir)
 
 uninstall:
 	$(RM) $(patsubst %, $(bindir)/%, $(targets))
